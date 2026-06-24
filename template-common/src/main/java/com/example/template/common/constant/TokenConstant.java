@@ -21,8 +21,7 @@ public interface TokenConstant {
     String CLIENT_TYPE_APP = "app";
 
     /** Web 端 Token 有效期（秒），默认 1 天 */
-//    long WEB_EXPIRE_SECONDS = 24 * 60 * 60;
-    long WEB_EXPIRE_SECONDS =5;
+    long WEB_EXPIRE_SECONDS = 24 * 60 * 60;
 
     /** App 端 Token 有效期（秒），默认 7 天 */
     long APP_EXPIRE_SECONDS = 7 * 24 * 60 * 60;
