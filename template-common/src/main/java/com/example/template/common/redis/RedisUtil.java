@@ -73,4 +73,38 @@ public class RedisUtil {
     public void del(String key) {
         stringRedisTemplate.delete(key);
     }
+
+    /**
+     * 原子递增计数；首次写入时设置过期时间。
+     *
+     * @param key     缓存键
+     * @param timeout 过期时长（仅对新建 key 生效）
+     * @param unit    时间单位
+     * @return 递增后的值
+     */
+    public long increment(String key, long timeout, TimeUnit unit) {
+        Long count = stringRedisTemplate.opsForValue().increment(key);
+        if (count != null && count == 1L) {
+            stringRedisTemplate.expire(key, timeout, unit);
+        }
+        return count != null ? count : 0L;
+    }
+
+    /**
+     * 读取计数值，不存在或非法时返回 0。
+     *
+     * @param key 缓存键
+     * @return 计数值
+     */
+    public int getCount(String key) {
+        String val = get(key);
+        if (val == null || val.isBlank()) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(val);
+        } catch (NumberFormatException ex) {
+            return 0;
+        }
+    }
 }

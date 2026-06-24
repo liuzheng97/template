@@ -14,9 +14,15 @@ public interface CacheNames {
     /** 用户 ID → Token 值，完整 Key：user:token:id:{userId} */
     String TOKEN_BY_USER = "user:token:id:";
 
-    /** 图形验证码，完整 Key：captcha:{key} */
-    String CAPTCHA_KEY = "captcha:";
-
     /** 登录失败锁定，完整 Key：login_lock:{account} */
     String LOGIN_LOCK = "login_lock:";
+
+    /** 登录连续失败次数，完整 Key：login_fail:{account} */
+    String LOGIN_FAIL = "login_fail:";
+
+    /** IP 登录失败锁定，完整 Key：login_lock_ip:{ip} */
+    String LOGIN_LOCK_IP = "login_lock_ip:";
+
+    /** IP 连续登录失败次数，完整 Key：login_fail_ip:{ip} */
+    String LOGIN_FAIL_IP = "login_fail_ip:";
 }

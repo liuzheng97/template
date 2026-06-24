@@ -26,6 +26,9 @@ public class UserDetail implements Serializable {
     @Schema(description = "用户姓名")
     private String name;
 
+    @Schema(description = "状态：1 启用，0 禁用")
+    private Integer status;
+
     @Schema(description = "访问令牌 UUID")
     private String token;
 

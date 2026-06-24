@@ -23,4 +23,7 @@ public class UserInfo implements Serializable {
 
     @Schema(description = "用户姓名")
     private String name;
+
+    @Schema(description = "状态：1 启用，0 禁用")
+    private Integer status;
 }

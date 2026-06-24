@@ -29,8 +29,23 @@ public interface TokenConstant {
     /** 登录失败锁定时长（分钟） */
     long LOGIN_LOCK_MINUTES = 5;
 
-    /** 验证码有效期（分钟） */
-    long CAPTCHA_EXPIRE_MINUTES = 30;
+    /** 单账号连续失败上限，达到后锁定 */
+    int LOGIN_MAX_RETRY = 5;
+
+    /** 单 IP 在统计窗口内连续失败上限，达到后锁定 */
+    int LOGIN_IP_MAX_RETRY = 10;
+
+    /** 登录失败计数窗口（分钟），账号与 IP 共用，超时后失败次数清零 */
+    long LOGIN_FAIL_WINDOW_MINUTES = 30;
+
+    /** IP 登录失败锁定时长（分钟） */
+    long LOGIN_IP_LOCK_MINUTES = 5;
+
+    /** 账号锁定提示 */
+    String MSG_LOGIN_ACCOUNT_LOCKED = "密码错误次数过多，账号已锁定5分钟";
+
+    /** IP 锁定提示 */
+    String MSG_LOGIN_IP_LOCKED = "登录过于频繁，IP已锁定5分钟";
 
     /**
      * 按客户端类型解析 Token 过期秒数。

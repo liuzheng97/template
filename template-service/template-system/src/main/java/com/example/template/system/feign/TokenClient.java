@@ -3,6 +3,7 @@ package com.example.template.system.feign;
 import cn.hutool.core.util.IdUtil;
 import com.example.template.common.api.R;
 import com.example.template.common.constant.TokenConstant;
+import com.example.template.common.constant.UserConstant;
 import com.example.template.common.model.UserDetail;
 import com.example.template.common.token.TokenStore;
 import com.example.template.system.api.feign.ITokenClient;
@@ -37,9 +38,9 @@ public class TokenClient implements ITokenClient {
             return R.fail(response.getMsg() != null ? response.getMsg() : "账号或密码错误");
         }
         UserDTO user = response.getData();
-        // 2. 检查账号状态
-        if (user.getStatus() != null && user.getStatus() == 0) {
-            return R.fail("账号已禁用");
+        // 2. 检查账号状态（禁用账号不计入 auth 侧密码失败次数）
+        if (user.getStatus() != null && user.getStatus() == UserConstant.STATUS_DISABLED) {
+            return R.fail(UserConstant.MSG_ACCOUNT_DISABLED);
         }
         // 3. 按客户端类型确定 Token 过期时间
         long expireSeconds = TokenConstant.expireSeconds(clientType);
@@ -50,6 +51,7 @@ public class TokenClient implements ITokenClient {
         detail.setUserId(user.getId());
         detail.setAccount(user.getAccount());
         detail.setName(user.getName());
+        detail.setStatus(user.getStatus());
         detail.setToken(token);
         detail.setExpiresIn(expireSeconds);
         // 6. 写入 Redis
