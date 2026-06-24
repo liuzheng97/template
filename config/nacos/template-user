@@ -1,0 +1,2 @@
+# template-user | Namespace=template | Group=DEV/PROD | user 服务专属（可扩展）
+user: {}

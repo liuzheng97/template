@@ -1,0 +1,31 @@
+# ============================================================
+# 认证服务 Bootstrap 配置（仅保留 Nacos 连接与配置导入）
+# 服务名: auth | 端口: 8100
+# 业务配置见 Nacos: template.yaml + auth.yaml
+# ============================================================
+
+server:
+  port: 8100
+
+spring:
+  application:
+    name: auth
+
+  config:
+    import:
+      - optional:nacos:template.yaml?group=DEV&refresh=true
+      - optional:nacos:auth.yaml?group=DEV&refresh=true
+
+  cloud:
+    nacos:
+      username: nacos
+      password: nacos
+      discovery:
+        server-addr: 127.0.0.1:8848
+        namespace: template
+        group: dev
+      config:
+        server-addr: 127.0.0.1:8848
+        namespace: template
+        group: DEFAULT_GROUP
+        file-extension: yaml

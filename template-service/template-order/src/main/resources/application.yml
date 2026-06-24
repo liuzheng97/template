@@ -1,0 +1,31 @@
+# ============================================================
+# 订单服务 Bootstrap 配置（仅保留 Nacos 连接与配置导入）
+# 服务名: order | 端口: 8103
+# 业务配置见 Nacos: template.yaml + order.yaml
+# ============================================================
+
+server:
+  port: 8103
+
+spring:
+  application:
+    name: order
+
+  config:
+    import:
+      - optional:nacos:template.yaml?group=DEV&refresh=true
+      - optional:nacos:order.yaml?group=DEV&refresh=true
+
+  cloud:
+    nacos:
+      username: nacos
+      password: nacos
+      discovery:
+        server-addr: 127.0.0.1:8848
+        namespace: template
+        group: dev
+      config:
+        server-addr: 127.0.0.1:8848
+        namespace: template
+        group: DEFAULT_GROUP
+        file-extension: yaml

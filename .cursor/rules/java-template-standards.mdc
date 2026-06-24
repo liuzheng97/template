@@ -1,0 +1,42 @@
+---
+description: Java/YAML 模版项目编码规范：注解、注释、启动类扫包约定
+globs: "**/*.{java,yml,yaml,xml}"
+alwaysApply: true
+---
+
+# Template 项目编码规范
+
+## 启动类（仿 sfa-center）
+
+- **main 方法**：统一 `TemplateLauncher.run(AppConstant.APPLICATION_*_NAME, XxxApplication.class, args)`
+- **gateway**：`@SpringBootApplication` 仅扫描本包，**禁止** `@ImportAutoConfiguration(CommonAutoConfiguration)`；可依赖 template-common 仅用于 Launcher
+- **业务服务**：`@SpringBootApplication` 仅扫描本包 + `@ImportAutoConfiguration(CommonAutoConfiguration.class)`
+- **禁止** `scanBasePackages = AppConstant.BASE_PACKAGES` 全量扫描 common
+
+## Java 注释与注解（加强）
+
+- **所有 public 类/接口**：类级 JavaDoc，说明职责、调用方
+- **字段**：实体/DTO 加 `@Schema(description)`；其他字段加行尾 `//` 或 JavaDoc
+- **public/protected 方法**：JavaDoc 说明用途、参数、返回值
+- **方法体内**：每个业务步骤块加单行注释（做什么、为什么），例如验密、写 Redis、调 Feign
+- **Controller**：`@Tag` + `@Operation` + `@Parameter`（含请求参数）
+- **Feign**：`@Operation` + 方法 JavaDoc + 参数说明
+- **配置类**：每个 `@Bean` / `@Import` 加 JavaDoc 说明注册目的
+- **常量/枚举**：每个常量加注释说明含义与单位
+- **不必注释**：`import`、`package`、空行、显而易见的 `}`
+
+## 配置文件（YAML/XML）
+
+- 文件头注释：服务名、端口说明
+- **本地 application.yml 仅保留 `server.port`**；Nacos 连接、`spring.config.import` 与 `extension-configs` 由 `LauncherServiceImpl` 在启动时注入
+- **Nacos 配置约定**：主配置 `template-{profile}.yaml`（DEFAULT_GROUP）；扩展 `template`、`template-{service}`（DEV/PROD）；由 `LauncherServiceImpl` 注入 `spring.config.import`
+- **业务/中间件配置全部在 Nacos**（`config/nacos/` 为参考，需导入控制台 Namespace=template）
+- **每个主要配置项**加 `# 作用` 注释
+- Nacos 参考文件放在 `config/nacos/`，注明 Data ID 与 Group
+
+## 公共模块
+
+- MyBatis/Redis/OpenAPI/Token 配置必须使用 `@ConditionalOnClass` / `@ConditionalOnBean`
+- 通过 `CommonAutoConfiguration` 按需引入，不在 gateway 中加载
+- MyBatis 必须通过 `MybatisAutoConfiguration` 条件包装，避免 auth 等服务启动失败
+- 登录用户信息通过 `UserContext`（ThreadLocal）获取；Service 可实现 `CurrentUserAware`；Controller 可用 `@LoginUser UserDetail`

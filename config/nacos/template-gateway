@@ -1,0 +1,75 @@
+# template-gateway | Namespace=template | Group=DEV/PROD
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: auth-openapi
+          uri: lb://auth
+          predicates:
+            - Path=/auth/v3/api-docs,/auth/swagger-ui/**,/auth/doc.html/**,/auth/webjars/**
+          filters:
+            - RewritePath=/auth/(?<segment>.*), /${segment}
+        - id: system-openapi
+          uri: lb://system
+          predicates:
+            - Path=/system/v3/api-docs,/system/swagger-ui/**,/system/doc.html/**,/system/webjars/**
+          filters:
+            - RewritePath=/system/(?<segment>.*), /${segment}
+        - id: user-openapi
+          uri: lb://user
+          predicates:
+            - Path=/user/v3/api-docs,/user/swagger-ui/**,/user/doc.html/**,/user/webjars/**
+          filters:
+            - RewritePath=/user/(?<segment>.*), /${segment}
+        - id: order-openapi
+          uri: lb://order
+          predicates:
+            - Path=/order/v3/api-docs,/order/swagger-ui/**,/order/doc.html/**,/order/webjars/**
+          filters:
+            - RewritePath=/order/(?<segment>.*), /${segment}
+        - id: auth-service
+          uri: lb://auth
+          predicates:
+            - Path=/auth/**
+        - id: system-service
+          uri: lb://system
+          predicates:
+            - Path=/sys/**
+        - id: user-service
+          uri: lb://user
+          predicates:
+            - Path=/user/**
+        - id: order-service
+          uri: lb://order
+          predicates:
+            - Path=/order/**
+
+knife4j:
+  gateway:
+    enabled: true
+    strategy: manual
+    routes:
+      - name: 认证中心
+        service-name: auth
+        url: /auth/v3/api-docs
+        context-path: /auth
+      - name: 基础数据
+        service-name: system
+        url: /system/v3/api-docs
+        context-path: /system
+      - name: 用户中心
+        service-name: user
+        url: /user/v3/api-docs
+        context-path: /user
+      - name: 订单中心
+        service-name: order
+        url: /order/v3/api-docs
+        context-path: /order
+
+management:
+  health:
+    elasticsearch:
+      enabled: false

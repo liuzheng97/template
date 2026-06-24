@@ -1,0 +1,18 @@
+# ============================================================
+# 系统服务专属配置
+# Nacos: Data ID = system.yaml | Group = DEV | Namespace = template
+# 作用: ES 开关、自动配置排除等
+# 引用: system 服务 spring.config.import
+# ============================================================
+
+spring:
+  elasticsearch:
+    # 启用 ES 时改为 true（或激活 es 配置导入 system-es.yaml）
+    enabled: false
+    uris: http://127.0.0.1:9200
+  autoconfigure:
+    exclude:
+      # ES 关闭时排除相关自动配置，避免启动连接 ES
+      - org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchDataAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRepositoriesAutoConfiguration

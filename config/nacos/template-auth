@@ -1,0 +1,2 @@
+# template-auth | Namespace=template | Group=DEV/PROD | auth 服务专属（可扩展）
+auth: {}

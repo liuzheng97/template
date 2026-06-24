@@ -1,0 +1,66 @@
+# ============================================================
+# 公共配置 - 所有业务微服务共享
+# Nacos: Data ID = template.yaml | Group = DEV | Namespace = template
+# 作用: MySQL、Redis、ES、MyBatis、文档、鉴权白名单等
+# 引用: auth / user / system / order 的 spring.config.import
+# ============================================================
+
+spring:
+  datasource:
+    # 连接池类型：Druid
+    type: com.alibaba.druid.pool.DruidDataSource
+    # MySQL 8 驱动
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 数据库连接地址（库名 template）
+    url: jdbc:mysql://127.0.0.1:3306/template?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8
+    username: root
+    password: root
+
+  data:
+    redis:
+      # Redis 主机地址
+      host: 127.0.0.1
+      port: 6379
+      # 使用的逻辑库编号（0-15）
+      database: 0
+
+  elasticsearch:
+    # ES 开关：false=不连接 ES
+    enabled: false
+    # ES 集群地址
+    uris: http://127.0.0.1:9200
+
+mybatis-plus:
+  configuration:
+    # 数据库下划线字段自动映射为 Java 驼峰属性
+    map-underscore-to-camel-case: true
+
+# Knife4j 接口文档（业务服务）
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+
+# OpenAPI 3 文档
+springdoc:
+  api-docs:
+    enabled: true
+
+# 健康检查
+management:
+  health:
+    elasticsearch:
+      # 未启用 ES 的服务关闭检查
+      enabled: false
+
+# Token 鉴权白名单（BasicTokenFilter 读取 secure.exclude-patterns）
+secure:
+  exclude-patterns:
+    - /internal/**     # 微服务内部接口
+    - /feign/**        # Feign 回调接口
+    - /auth/**         # 认证服务登录、验证码
+    - /v3/api-docs/**  # OpenAPI JSON
+    - /swagger-ui/**   # Swagger UI
+    - /doc.html        # Knife4j 入口
+    - /webjars/**      # 文档静态资源
+    - /error           # 错误页

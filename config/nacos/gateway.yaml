@@ -1,0 +1,13 @@
+# ============================================================
+# 网关专属配置
+# Nacos: Data ID = gateway.yaml | Group = DEV | Namespace = template
+# 作用: 网关路由、服务发现等（可与本地 application.yml 合并生效）
+# ============================================================
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          # 开启基于服务发现的动态路由（如 /auth/xxx 自动转发到 auth 服务）
+          enabled: true

@@ -1,0 +1,118 @@
+# ============================================================
+# 网关服务本地配置
+# 服务名: gateway | 端口: 8000
+# 说明: 本地配置 + Nacos 远程配置合并生效，Nacos 优先级更高
+# ============================================================
+
+server:
+  port: 8000
+
+spring:
+  application:
+    # 注册到 Nacos 的服务名，路由 lb://auth 等均依赖此名称
+    name: gateway
+
+  config:
+    import:
+      # optional: Nacos 不可用时仍可启动
+      # template.yaml: 公共配置（MySQL/Redis/ES）
+      - optional:nacos:template.yaml?group=DEV&refresh=true
+      # gateway.yaml: 网关专属配置
+      - optional:nacos:gateway.yaml?group=DEV&refresh=true
+
+  cloud:
+    nacos:
+      username: nacos
+      password: nacos
+      discovery:
+        # 服务注册中心地址
+        server-addr: 127.0.0.1:8848
+        # 命名空间，需与 Nacos 控制台一致
+        namespace: template
+        # 服务注册分组
+        group: dev
+      config:
+        server-addr: 127.0.0.1:8848
+        namespace: template
+        # 默认配置分组（import 中 group=DEV 会覆盖）
+        group: DEFAULT_GROUP
+        file-extension: yaml
+
+    gateway:
+      discovery:
+        locator:
+          # 基于服务名自动发现路由
+          enabled: true
+      routes:
+        # ---------- OpenAPI 文档路由（带路径重写） ----------
+        - id: auth-openapi
+          uri: lb://auth
+          predicates:
+            - Path=/auth/v3/api-docs,/auth/swagger-ui/**,/auth/doc.html/**,/auth/webjars/**
+          filters:
+            # 去掉 /auth 前缀后转发给下游服务
+            - RewritePath=/auth/(?<segment>.*), /${segment}
+        - id: system-openapi
+          uri: lb://system
+          predicates:
+            - Path=/system/v3/api-docs,/system/swagger-ui/**,/system/doc.html/**,/system/webjars/**
+          filters:
+            - RewritePath=/system/(?<segment>.*), /${segment}
+        - id: user-openapi
+          uri: lb://user
+          predicates:
+            - Path=/user/v3/api-docs,/user/swagger-ui/**,/user/doc.html/**,/user/webjars/**
+          filters:
+            - RewritePath=/user/(?<segment>.*), /${segment}
+        - id: order-openapi
+          uri: lb://order
+          predicates:
+            - Path=/order/v3/api-docs,/order/swagger-ui/**,/order/doc.html/**,/order/webjars/**
+          filters:
+            - RewritePath=/order/(?<segment>.*), /${segment}
+        # ---------- 业务服务路由（转发时保留路径前缀） ----------
+        - id: auth-service
+          uri: lb://auth
+          predicates:
+            - Path=/auth/**       # 认证：登录、验证码、登出
+        - id: system-service
+          uri: lb://system
+          predicates:
+            - Path=/sys/**        # 系统：日志、Token Feign 等
+        - id: user-service
+          uri: lb://user
+          predicates:
+            - Path=/user/**       # 用户：分页、内部验密
+        - id: order-service
+          uri: lb://order
+          predicates:
+            - Path=/order/**      # 订单：创建、支付、取消
+
+# Knife4j 网关文档聚合（开发环境使用）
+knife4j:
+  gateway:
+    enabled: true
+    strategy: manual # 手动配置各服务文档地址
+    routes:
+      - name: 认证中心
+        service-name: auth
+        url: /auth/v3/api-docs
+        context-path: /auth
+      - name: 基础数据
+        service-name: system
+        url: /system/v3/api-docs
+        context-path: /system
+      - name: 用户中心
+        service-name: user
+        url: /user/v3/api-docs
+        context-path: /user
+      - name: 订单中心
+        service-name: order
+        url: /order/v3/api-docs
+        context-path: /order
+
+management:
+  health:
+    elasticsearch:
+      # 网关不依赖 ES，关闭健康检查避免误报
+      enabled: false

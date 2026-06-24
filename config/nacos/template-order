@@ -1,0 +1,2 @@
+# template-order | Namespace=template | Group=DEV/PROD | order 服务专属（可扩展）
+order: {}

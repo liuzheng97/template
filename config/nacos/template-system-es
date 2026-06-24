@@ -1,0 +1,12 @@
+# template-system-es | Namespace=template | Group=DEV/PROD | system 服务 profile=es
+spring:
+  elasticsearch:
+    enabled: true
+    uris: http://127.0.0.1:9200
+  autoconfigure:
+    exclude: []
+
+management:
+  health:
+    elasticsearch:
+      enabled: true
